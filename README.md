@@ -1,2 +1,2 @@
-# aurecle
+# AuReClE
 Augemented Reality Cleareance Estimation
