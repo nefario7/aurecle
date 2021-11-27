@@ -45,7 +45,10 @@ cv2.namedWindow("Output")
 
 
 segmented_lab = Lab_Segmentation(lab_image, 0, 106, 105, 164, 51, 177)
-cv2.imshow("Output", segmented_lab)
+gray = cv2.cvtColor(segmented_lab, cv2.COLOR_BGR2GRAY)
+cv2.imwrite('lab_image_threshold.png',gray)
+cv2.imshow("Output", gray)
+
 cv2.waitKey(0)
 
 cv2.destroyAllWindows()
