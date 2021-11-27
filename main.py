@@ -20,7 +20,7 @@ args = parser.parse_args()
 if __name__ == "__main__":
     if args.process == "seg":
         print("Running Segmentation...")
-        slic = SlicSegmentation(k=200, m=20)
+        slic = SlicSegmentation(k=200, m=20)  # range of m = [1,40]
         slic.process(args.image)
 
     if args.process == "lab":
@@ -32,5 +32,5 @@ if __name__ == "__main__":
         else:
             slic_image = cv.imread(os.path.join(base_path, args.image))
         segmented_lab = lab_segmentation(slic_image, 0, 106, 105, 164, 51, 177)
-        save(segmented_lab, args.image, "lab")
+        save(segmented_lab, args.image, ext="_lab")
         show(segmented_lab)
