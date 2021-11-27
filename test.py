@@ -35,7 +35,7 @@ def Lab_Segmentation(image,L_lower, L_upper, a_lower, a_upper, b_lower, b_upper)
 
 
 
-image = cv2.imread('outputs/pitt_out_m20_k200.png')
+image = cv2.imread('felzen_pitt_copy_seg.png')
 
 lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
 cv2.namedWindow("Output")

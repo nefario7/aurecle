@@ -42,7 +42,7 @@ def nothing(x):
 def main(argv):
 
 
-    image = cv2.imread('segmentation-images-test/pitt.jpeg')
+    image = cv2.imread('felzen_pitt_copy_seg.png')
     
     lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
     cv2.namedWindow("Output")
@@ -88,5 +88,3 @@ if __name__ == '__main__':
 
 # edges = cv2.Canny(gray, 50, 200)
 # cv2.imwrite('pitt_lab.jpeg', image)
-
-
