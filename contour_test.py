@@ -2,13 +2,19 @@
 import cv2
 import numpy as np 
 
-threshold_value = 0.3
-image = cv2.imread('lab_image_threshold.png', 0)
+threshold_value = 0.02
+filename = "326"
+image_name = filename + 'image_threshold.png'
+image = cv2.imread(image_name, 0)
+image_color = cv2.imread(filename + '_out_m30_k400.png')
 image_copy = image.copy()
-image_color  = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+# image_color  = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+image[300:400, :] = 0
+
 for row in image:
-    if (sum(row) < threshold_value* 128 * image.shape[1]):
+    if (sum(row) < threshold_value* 55 * image.shape[1]):
         row[:] = 0
+
 
 
 cont, hier = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -29,5 +35,6 @@ M = cv2.moments(sorted_contours[0])
 # %%
 cv2.imshow('OG', image_copy)
 cv2.imshow('output', image_color)
+cv2.imwrite(filename+'detected.png', image_color)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

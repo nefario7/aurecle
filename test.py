@@ -12,6 +12,12 @@ import os
 
 [  0 105  51]
 [106 164 177]
+
+
+
+new images 
+[  5 128 114]
+[ 33 165 131]
 '''
 
 def Lab_Segmentation(image,L_lower, L_upper, a_lower, a_upper, b_lower, b_upper):
@@ -31,11 +37,10 @@ def Lab_Segmentation(image,L_lower, L_upper, a_lower, a_upper, b_lower, b_upper)
 
     return faceLab
 
+filename = "326"
+image_name = filename + "_out_m30_k400.png"
 
-
-
-
-image = cv2.imread('outputs/pitt_out_m20_k200.png')
+image = cv2.imread(image_name)
 
 lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
 cv2.namedWindow("Output")
@@ -44,9 +49,9 @@ cv2.namedWindow("Output")
 
 
 
-segmented_lab = Lab_Segmentation(lab_image, 0, 106, 105, 164, 51, 177)
+segmented_lab = Lab_Segmentation(lab_image, 5, 33, 128, 165, 114, 131)
 gray = cv2.cvtColor(segmented_lab, cv2.COLOR_BGR2GRAY)
-cv2.imwrite('lab_image_threshold.png',gray)
+cv2.imwrite(filename + 'image_threshold.png',gray)
 cv2.imshow("Output", gray)
 
 cv2.waitKey(0)

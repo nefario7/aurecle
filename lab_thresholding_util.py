@@ -42,7 +42,7 @@ def nothing(x):
 def main(argv):
 
 
-    image = cv2.imread('felzen_pitt_copy_seg.png')
+    image = cv2.imread('311_out_m30_k400.png')
     
     lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
     cv2.namedWindow("Output")
