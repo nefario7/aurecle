@@ -9,7 +9,7 @@ from slic import SlicSegmentation
 from utils import bbox_intersection
 
 base_path = r"pitt_gray1_out_m20_k200.png"
-rishabh_paht = r"/home/rishabh/CV_project/aurecle/sample_video/video_frame/"
+rishabh_path = r"/home/rishabh/CV_project/aurecle/sample_video/video_frame/"
 
 
 def lab_segmentation(image, L_lower, L_upper, a_lower, a_upper, b_lower, b_upper):
@@ -58,8 +58,7 @@ def aurecle_segmentation(image, m=40, k=400):
 
     x, y, w, h = contour_process(lab_threshold)
 
-    return [x, y, w, h], segmented_image, threshold_image
-
+    return [x, y, w, h], segmented_image, lab_threshold
 
 def video_processing(video_path):
     input_video = cv.VideoCapture(video_path)
