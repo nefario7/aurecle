@@ -156,7 +156,7 @@ class SlicSegmentation:
         #     print("File could not be found!")
         #     exit(0)
         # rgb = frame[:, :, ::-1]
-        rgb = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+        rgb = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
 
         img = resize(rgb, (400, 400), anti_aliasing=True)
 
@@ -170,5 +170,6 @@ class SlicSegmentation:
         # initialize the distance between pixels and cluster center as infinity
         dis = np.full((self.img_h, self.img_w), np.inf)
         ret_image = self.__slic(S, dis)
+        ret_image = ret_image / 255
         cv_image = img_as_ubyte(ret_image)
         return cv_image

@@ -6,7 +6,7 @@ import glob
 
 # * Imports
 from slic import SlicSegmentation
-from utils import bbox_intersection
+from utils import *
 
 base_path = r"pitt_gray1_out_m20_k200.png"
 rishabh_path = r"/home/rishabh/CV_project/aurecle/sample_video/video_frame/"
@@ -51,20 +51,27 @@ def contour_process(image):
 
 def aurecle_segmentation(image, m=40, k=400):
     slic = SlicSegmentation(m, k)
+    print("Running Aurecle Segmentation INSIDE VER...")
     segmented_image = slic.process(image)
-
+    show(segmented_image)
     lab_threshold = lab_segmentation(segmented_image, 5, 33, 128, 165, 114, 131)
     lab_threshold = cv.cvtColor(lab_threshold, cv.COLOR_BGR2GRAY)
-
+    show(lab_threshold)
     x, y, w, h = contour_process(lab_threshold)
 
     return [x, y, w, h], segmented_image, lab_threshold
 
+
 def video_processing(video_path):
-    input_video = cv.VideoCapture(video_path)
     output_path = os.path.join(video_path.split(".")[0] + "_output.avi")
     print("Video output path : ", output_path)
+
+    input_video = cv.VideoCapture(video_path)
     output_video = cv.VideoWriter(output_path, cv.VideoWriter_fourcc("M", "J", "P", "G"), 1, (400, 400))
+
+    # input_video = video.Video(video_path)
+    # print(input_video.frame_count(), input_video.duration())
+    # output_video = cv.VideoWriter(output_path, cv.VideoWriter_fourcc("M", "J", "P", "G"), 1, (400, 400))
 
     frame_ctr = 0
     while True:
