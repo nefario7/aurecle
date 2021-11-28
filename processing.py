@@ -26,6 +26,24 @@ def lab_segmentation(image, L_lower, L_upper, a_lower, a_upper, b_lower, b_upper
 
     return faceLab
 
+def contour_process(image):
+    threshold_value = 0.02
+    image_copy = image.copy()
+    image[300:400, :] = 0
+
+    for row in image:
+        if (sum(row) < threshold_value* 55 * image.shape[1]):
+            row[:] = 0
+
+
+
+    cont, hier = cv.findContours(image, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    sorted_contours = sorted(cont, key = cv.contourArea, reverse=True)
+    # cv.drawContours(image_color, sorted_contours, 0, (255,0,255), 2, cv.LINE_AA)
+    rect = cv.boundingRect(sorted_contours[0])
+    return rect    
+
+
 
 # class Segmentation:
 #     def __init__(self, path):
