@@ -8,6 +8,7 @@ from skimage.transform import resize
 from skimage.util import img_as_ubyte
 from tqdm import tqdm
 from skimage import img_as_ubyte
+
 # * Imports
 from utils import *
 
@@ -142,7 +143,7 @@ class SlicSegmentation:
             self.__assign_pixels_to_cluster(S, dis)
             self.__update_cluster_mean()
             if i == 9:  # to print the output after 10 iterations
-                name = "{imgname}_out_m{m}_k{k}.png".format(loop=i, m=self.m, k=self.k, imgname='filler')
+                name = "{imgname}_out_m{m}_k{k}.png".format(loop=i, m=self.m, k=self.k, imgname="filler")
                 return_image = self.__avg_color_cluster()
 
         return return_image
@@ -154,8 +155,8 @@ class SlicSegmentation:
         # except:
         #     print("File could not be found!")
         #     exit(0)
-        rgb = frame[:, :, ::-1]
-
+        # rgb = frame[:, :, ::-1]
+        rgb = cv.cvtColor(img, cv.COLOR_BGR2RGB)
 
         img = resize(rgb, (400, 400), anti_aliasing=True)
 
@@ -168,6 +169,6 @@ class SlicSegmentation:
 
         # initialize the distance between pixels and cluster center as infinity
         dis = np.full((self.img_h, self.img_w), np.inf)
-        ret_image  = self.__slic(S, dis)
+        ret_image = self.__slic(S, dis)
         cv_image = img_as_ubyte(ret_image)
         return cv_image
