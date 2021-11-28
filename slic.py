@@ -5,8 +5,9 @@ import os
 import numpy as np
 from skimage import io, color
 from skimage.transform import resize
+from skimage.util import img_as_ubyte
 from tqdm import tqdm
-
+from skimage import img_as_ubyte
 # * Imports
 from utils import *
 
@@ -114,7 +115,7 @@ class SlicSegmentation:
                 c.update(H, W, self.img[H, W][0], self.img[H, W][1], self.img[H, W][2])
 
     # replace the color of each pixel in a cluster by the color of the cluster's center
-    def __avg_color_cluster(self, name):
+    def __avg_color_cluster(self):
         image = np.copy(self.img)
         for c in self.clusters:
             for p in c.pixels:
@@ -125,7 +126,7 @@ class SlicSegmentation:
             # image[c.h, c.w][0] = 0
             # image[c.h, c.w][1] = 0
             # image[c.h, c.w][2] = 0
-        self.__save_output(image, name)
+        # self.__save_output(image, name)
         return image
 
     def __save_output(self, lab_arr, save_name):
@@ -134,25 +135,27 @@ class SlicSegmentation:
         io.imsave(save_path, rgb_arr)
 
     # function for the Simple Linear Iterative Clustering
-    def __slic(self, S, dis, imgname, iterations=10):
+    def __slic(self, S, dis, iterations=10):
         self.__initial_cluster_center(S)
         self.__reassign_cluster_center_acc_to_grad()
         for i in tqdm(range(iterations)):  # usually the algortihm converges within 10 iterations
             self.__assign_pixels_to_cluster(S, dis)
             self.__update_cluster_mean()
             if i == 9:  # to print the output after 10 iterations
-                name = "{imgname}_out_m{m}_k{k}.png".format(loop=i, m=self.m, k=self.k, imgname=imgname)
-                return_image = self.__avg_color_cluster(name)
+                name = "{imgname}_out_m{m}_k{k}.png".format(loop=i, m=self.m, k=self.k, imgname='filler')
+                return_image = self.__avg_color_cluster()
 
         return return_image
 
-    def process(self, image_name):
-        image_path = os.path.join(self.base_path, image_name)
-        try:
-            rgb = io.imread(image_path, plugin="matplotlib")
-        except:
-            print("File could not be found!")
-            exit(0)
+    def process(self, frame):
+        # image_path = os.path.join(self.base_path, image_name)
+        # try:
+        #     rgb = io.imread(image_path, plugin="matplotlib")
+        # except:
+        #     print("File could not be found!")
+        #     exit(0)
+        rgb = frame[:, :, ::-1]
+
 
         img = resize(rgb, (400, 400), anti_aliasing=True)
 
@@ -165,4 +168,6 @@ class SlicSegmentation:
 
         # initialize the distance between pixels and cluster center as infinity
         dis = np.full((self.img_h, self.img_w), np.inf)
-        self.__slic(S, dis, image_name.split(".")[0])
+        ret_image  = self.__slic(S, dis)
+        cv_image = img_as_ubyte(ret_image)
+        return cv_image
