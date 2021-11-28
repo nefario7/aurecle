@@ -9,6 +9,7 @@ from slic import SlicSegmentation
 from utils import bbox_intersection
 
 base_path = r"pitt_gray1_out_m20_k200.png"
+rishabh_paht = r"/home/rishabh/CV_project/aurecle/sample_video/video_frame/"
 
 
 def lab_segmentation(image, L_lower, L_upper, a_lower, a_upper, b_lower, b_upper):
@@ -57,7 +58,7 @@ def aurecle_segmentation(image, m=40, k=400):
 
     x, y, w, h = contour_process(lab_threshold)
 
-    return [x, y, w, h]
+    return [x, y, w, h], segmented_image, threshold_image
 
 
 def video_processing(video_path):
@@ -67,31 +68,25 @@ def video_processing(video_path):
     output_video = cv.VideoWriter(output_path, cv.VideoWriter_fourcc("M", "J", "P", "G"), 1, (400, 400))
 
     frame_ctr = 0
-    # images_names=glob.glob('/home/rishabh/CV_project/aurecle/sample_video')
-
     while True:
-        print(frame_ctr)
         ret, frame = input_video.read()
-        if frame_ctr%10==0:
-            print(f"Processing frame {frame_ctr}")
-            
-            
+        if frame_ctr % 10 == 0:
+            print(f"_________ Processing frame {frame_ctr} _________")
             if ret == False:
-                print("Breaking")
-
+                print("Saving Video!")
                 break
-            # iname='/home/rishabh/CV_project/aurecle/sample_video/'+i
-            
-            frame_rect = aurecle_segmentation(frame, 30, 400)
-    
+
+            frame_rect, seg_img, thr_img = aurecle_segmentation(frame, 30, 400)
             # bbox_y = frame_rect[1]
             # bbox_h = frame_rect[3]
 
             bbox_frame = cv.rectangle(
                 frame, (frame_rect[0], frame_rect[1]), (frame_rect[0] + frame_rect[2], frame_rect[1] + frame_rect[3]), (255, 0, 0), 2
             )
-            name="/home/rishabh/CV_project/aurecle/sample_video/video_frame/"+str(frame_ctr)+".jpg"
-            cv.imwrite(name,bbox_frame)
+            print("Bounding Box: ", frame_rect)
+            cv.imwrite(rishabh_path + str(frame_ctr) + "_bbox" + ".jpg", bbox_frame)
+            cv.imwrite(rishabh_path + str(frame_ctr) + "_seg" + ".jpg", seg_img)
+            cv.imwrite(rishabh_path + str(frame_ctr) + "_thr" + ".jpg", thr_img)
             output_video.write(bbox_frame)
 
             # #! Get left and the right lines
@@ -103,7 +98,6 @@ def video_processing(video_path):
 
             # #! Stuff to do on the intersection
 
-            print("processing complete")
         frame_ctr += 1
 
     input_video.release()
