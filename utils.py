@@ -9,11 +9,12 @@ from skimage import io
 base_path = r"sample"
 
 
-def show(image):
-    letters = string.ascii_lowercase
-    name = "".join(random.choice(letters) for i in range(10))
-    cv.namedWindow(name, cv.WINDOW_NORMAL)
-    cv.imshow(name, image)
+def show(image, header = None):
+    if header is None:
+        letters = string.ascii_lowercase
+        header = "".join(random.choice(letters) for i in range(10))
+    cv.namedWindow(header, cv.WINDOW_NORMAL)
+    cv.imshow(header, image)
     cv.waitKey(0)
     cv.destroyAllWindows()
 

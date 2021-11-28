@@ -149,27 +149,16 @@ class SlicSegmentation:
         return return_image
 
     def process(self, frame):
-        # image_path = os.path.join(self.base_path, image_name)
-        # try:
-        #     rgb = io.imread(image_path, plugin="matplotlib")
-        # except:
-        #     print("File could not be found!")
-        #     exit(0)
-        # rgb = frame[:, :, ::-1]
-        rgb = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
-
-        img = resize(rgb, (400, 400), anti_aliasing=True)
+        img = resize(frame, (400, 400), anti_aliasing=True)
 
         self.img = color.rgb2lab(img)
         self.img_h = img.shape[0]  # Image Height
         self.img_w = img.shape[1]  # Image Width
-
         N = self.img_h * self.img_w  # Total number of pixels in the image
         S = int(math.sqrt(N / self.k))  # average size of each superpixel
 
-        # initialize the distance between pixels and cluster center as infinity
         dis = np.full((self.img_h, self.img_w), np.inf)
-        ret_image = self.__slic(S, dis)
-        ret_image = ret_image / 255
-        cv_image = img_as_ubyte(ret_image)
-        return cv_image
+        segmented_image = self.__slic(S, dis)
+        segmented_image = color.lab2rgb(segmented_image)
+
+        return segmented_image
