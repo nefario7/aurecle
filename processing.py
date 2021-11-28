@@ -13,7 +13,7 @@ rishabh_path = r"/home/rishabh/CV_project/aurecle/sample_video/video_frame/"
 
 
 def lab_segmentation(image, L_lower, L_upper, a_lower, a_upper, b_lower, b_upper):
-    image = cv.cvtColor(image, cv.COLOR_BGR2LAB)
+    # image = cv.cvtColor(image, cv.COLOR_BGR2LAB)
     lowerRange = np.array([L_lower, a_lower, b_lower], dtype="uint8")
     upperRange = np.array([L_upper, a_upper, b_upper], dtype="uint8")
     mask = image[:].copy()
@@ -43,22 +43,31 @@ def contour_process(image):
             row[:] = 0
 
     cont, hier = cv.findContours(image, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    if(len(cont)<1):
+        return None
     sorted_contours = sorted(cont, key=cv.contourArea, reverse=True)
+    
     # cv.drawContours(image_color, sorted_contours, 0, (255,0,255), 2, cv.LINE_AA)
     rect = cv.boundingRect(sorted_contours[0])
     return rect
 
-
 def aurecle_segmentation(image, m=40, k=400):
     slic = SlicSegmentation(m, k)
-    print("Running Aurecle Segmentation INSIDE VER...")
-    segmented_image = slic.process(image)
-    show(segmented_image)
-    lab_threshold = lab_segmentation(segmented_image, 5, 33, 128, 165, 114, 131)
-    lab_threshold = cv.cvtColor(lab_threshold, cv.COLOR_BGR2GRAY)
-    show(lab_threshold)
-    x, y, w, h = contour_process(lab_threshold)
 
+    segmented_image = slic.process(image)
+    show(segmented_image, "segmented image")
+
+    lab_threshold = lab_segmentation(segmented_image, 5, 33, 128, 165, 114, 131)
+    show(lab_threshold, "threshold")
+    lab_threshold = cv.cvtColor(lab_threshold, cv.COLOR_BGR2GRAY)
+
+    x, y, w, h = contour_process(lab_threshold)
+    frame_rect = [x,y,w,h]
+
+    bbox_frame = cv.rectangle(
+                lab_threshold, (frame_rect[0], frame_rect[1]), (frame_rect[0] + frame_rect[2], frame_rect[1] + frame_rect[3]), (255, 0, 0), 2
+            )
+    show(bbox_frame,"bbox")
     return [x, y, w, h], segmented_image, lab_threshold
 
 

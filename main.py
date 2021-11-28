@@ -20,6 +20,7 @@ args = parser.parse_args()
 """
 Commands:
 python main.py --video "sample_video\13_19_49.mp4"
+python main.py --image "sample\pitt.jpeg" --process "aurecle"
 """
 
 if __name__ == "__main__":
@@ -30,15 +31,19 @@ if __name__ == "__main__":
         print("Running Aurecle Pipeline...")
         rimg = cv.imread(args.image)
         _, _, _ = aurecle_segmentation(rimg, m=30, k=400)
+        # slic = SlicSegmentation(m=30, k=400)
+        # slic_image = slic.process(rimg)
+        # show(slic_image)
 
-    if args.process == "lab":
-        print("Running LAB Segmentation...")
 
-        if args.process.split("_")[-1] == "seg":
-            slic = SlicSegmentation(k=200, m=20)
-            slic_image = slic.process(args.image)
-        else:
-            slic_image = cv.imread(os.path.join(base_path, args.image))
-        segmented_lab = lab_segmentation(slic_image, 0, 106, 105, 164, 51, 177)
-        save(segmented_lab, args.image, ext="_lab")
-        show(segmented_lab)
+    # if args.process == "lab":
+    #     print("Running LAB Segmentation...")
+
+    #     if args.process.split("_")[-1] == "seg":
+    #         slic = SlicSegmentation(k=200, m=20)
+    #         slic_image = slic.process(args.image)
+    #     else:
+    #         slic_image = cv.imread(os.path.join(base_path, args.image))
+    #     segmented_lab = lab_segmentation(slic_image, 0, 106, 105, 164, 51, 177)
+    #     save(segmented_lab, args.image, ext="_lab")
+    #     show(segmented_lab)
