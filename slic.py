@@ -149,44 +149,16 @@ class SlicSegmentation:
         return return_image
 
     def process(self, frame):
-        #! frame = cv.cvtColor(frame, cv.COLOR_BGR2LAB)
-        #! frame = frame.astype(np.uint8)
-
-        #! frame = frame[:,:,::-1]
-        # frame = resize(frame, (400,400))
-
-        #! self.img = frame
-        # self.img_h = self.img.shape[0]  # Image Height
-        # self.img_w = self.img.shape[1]  # Image Width
-        # N = self.img_h * self.img_w  # Total number of pixels in the image
-        # S = int(math.sqrt(N / self.k))  # average size of each superpixel
-
-        # # initialize the distance between pixels and cluster center as infinity
-        # dis = np.full((self.img_h, self.img_w), np.inf)
-        # ret_image = self.__slic(S, dis)
-        # # save(ret_image, 'ret_image', 'sk' )
-
-        # # ret_image = ret_image / 255
-        #! cv_image = img_as_ubyte(ret_image)
-        # for i in range(3):
-        #     show(cv_image[:,:,i], "channel " + str(i) )
-        #! cv_image = cv_image[:,:,::-1]
-        #! cv_image = cv.cvtColor(cv_image, cv.COLOR_Lab2BGR)
-        # show(cv_image)
-        # save(cv_image, 'cv_image', cv)
-        # return cv_image
-
         img = resize(frame, (400, 400), anti_aliasing=True)
 
         self.img = color.rgb2lab(img)
         self.img_h = img.shape[0]  # Image Height
         self.img_w = img.shape[1]  # Image Width
-
         N = self.img_h * self.img_w  # Total number of pixels in the image
         S = int(math.sqrt(N / self.k))  # average size of each superpixel
 
-        # initialize the distance between pixels and cluster center as infinity
         dis = np.full((self.img_h, self.img_w), np.inf)
         segmented_image = self.__slic(S, dis)
+        segmented_image = color.lab2rgb(segmented_image)
 
         return segmented_image
