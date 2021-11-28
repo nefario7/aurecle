@@ -27,14 +27,24 @@ if __name__ == "__main__":
     if args.video is not None:
         video_processing(args.video)
 
-    if args.image is not None and args.process == "aurecle":
-        print("Running Aurecle Pipeline...")
-        rimg = cv.imread(args.image)
-        _, _, _ = aurecle_segmentation(rimg, m=30, k=400)
-        # slic = SlicSegmentation(m=30, k=400)
-        # slic_image = slic.process(rimg)
-        # show(slic_image)
+    if args.image is not None:
+        if args.process == "aurecle":
+            print("Running Aurecle Pipeline...")
+            rimg = cv.imread(args.image)
+            _, _, _ = aurecle_segmentation(rimg, m=30, k=400)
+            # slic = SlicSegmentation(m=30, k=400)
+            # slic_image = slic.process(rimg)
+            # show(slic_image)
+        elif args.process == "slic":
+            print("Running SLIC...")
+            rimg = cv.imread(args.image)
+            rimg = cv.cvtColor(rimg, cv.COLOR_BGR2RGB)
+            slic = SlicSegmentation(m=20, k=200)
+            slic_image = slic.process(rimg)
 
+            save(slic_image, "temp", mode="sk")
+            slic_image = cv.cvtColor(slic_image, cv.COLOR_BGR2RGB)
+            save(slic_image, "temp_bgr2rgb", mode="cv")
 
     # if args.process == "lab":
     #     print("Running LAB Segmentation...")
