@@ -2,6 +2,7 @@ import cv2 as cv
 import os
 import numpy as np
 from tqdm import tqdm
+import glob
 
 # * Imports
 from slic import SlicSegmentation
@@ -52,7 +53,7 @@ def aurecle_segmentation(image, m=40, k=400):
     segmented_image = slic.process(image)
 
     lab_threshold = lab_segmentation(segmented_image, 5, 33, 128, 165, 114, 131)
-    lab_threshold = cv2.cvtColor(lab_threshold, cv2.COLOR_BGR2GRAY)
+    lab_threshold = cv.cvtColor(lab_threshold, cv.COLOR_BGR2GRAY)
 
     x, y, w, h = contour_process(lab_threshold)
 
@@ -63,24 +64,34 @@ def video_processing(video_path):
     input_video = cv.VideoCapture(video_path)
     output_path = os.path.join(video_path.split(".")[0] + "_output.avi")
     print("Video output path : ", output_path)
-    output_video = cv.VideoWriter(output_path, cv.VideoWriter_fourcc("M", "J", "P", "G"), 5, (400, 400))
+    output_video = cv.VideoWriter(output_path, cv.VideoWriter_fourcc("M", "J", "P", "G"), 1, (400, 400))
 
     frame_ctr = 0
+    # images_names=glob.glob('/home/rishabh/CV_project/aurecle/sample_video')
+
     while True:
-        print(f"Processing frame {frame_ctr}")
-        if frame_ctr % 5 == 0:
-            ret, frame = input_video.read()
+        print(frame_ctr)
+        ret, frame = input_video.read()
+        if frame_ctr%10==0:
+            print(f"Processing frame {frame_ctr}")
+            
+            
             if ret == False:
                 print("Breaking")
-                break
-            frame_rect = aurecle_segmentation(frame, 30, 400)
 
+                break
+            # iname='/home/rishabh/CV_project/aurecle/sample_video/'+i
+            
+            frame_rect = aurecle_segmentation(frame, 30, 400)
+    
             # bbox_y = frame_rect[1]
             # bbox_h = frame_rect[3]
 
             bbox_frame = cv.rectangle(
-                frame, frame_rect[0], frame_rect[1], frame_rect[0] + frame_rect[2], frame_rect[1] + frame_rect[3], (255, 0, 0), 2
+                frame, (frame_rect[0], frame_rect[1]), (frame_rect[0] + frame_rect[2], frame_rect[1] + frame_rect[3]), (255, 0, 0), 2
             )
+            name="/home/rishabh/CV_project/aurecle/sample_video/video_frame/"+str(frame_ctr)+".jpg"
+            cv.imwrite(name,bbox_frame)
             output_video.write(bbox_frame)
 
             # #! Get left and the right lines
@@ -92,10 +103,11 @@ def video_processing(video_path):
 
             # #! Stuff to do on the intersection
 
-            frame_ctr += 1
+            print("processing complete")
+        frame_ctr += 1
 
-        input_video.release()
-        output_video.release()
+    input_video.release()
+    output_video.release()
 
 
 # class Segmentation:
