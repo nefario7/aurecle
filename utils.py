@@ -25,3 +25,11 @@ def save(image, name, mode="cv", pref="", ext=""):
     elif mode == "sk":
         io.imsave(save_path, image)
     print("Image saved at : ", save_path)
+
+
+def bbox_intersection(self, y, h, line):
+    slope = (line[3] - line[1]) / (line[2] - line[0])
+    y = y + h
+    x = ((y - line[1]) / slope) + line[0]
+
+    return np.array([x, y])

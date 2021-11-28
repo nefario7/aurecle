@@ -3,6 +3,10 @@ import os
 import numpy as np
 from tqdm import tqdm
 
+# * Imports
+from slic import SlicSegmentation
+from utils import bbox_intersection
+
 base_path = r"pitt_gray1_out_m20_k200.png"
 
 
@@ -26,23 +30,72 @@ def lab_segmentation(image, L_lower, L_upper, a_lower, a_upper, b_lower, b_upper
 
     return faceLab
 
+
 def contour_process(image):
     threshold_value = 0.02
     image_copy = image.copy()
     image[300:400, :] = 0
 
     for row in image:
-        if (sum(row) < threshold_value* 55 * image.shape[1]):
+        if sum(row) < threshold_value * 55 * image.shape[1]:
             row[:] = 0
 
-
-
     cont, hier = cv.findContours(image, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-    sorted_contours = sorted(cont, key = cv.contourArea, reverse=True)
+    sorted_contours = sorted(cont, key=cv.contourArea, reverse=True)
     # cv.drawContours(image_color, sorted_contours, 0, (255,0,255), 2, cv.LINE_AA)
     rect = cv.boundingRect(sorted_contours[0])
-    return rect    
+    return rect
 
+
+def aurecle_segmentation(image, m=40, k=400):
+    slic = SlicSegmentation(m, k)
+    segmented_image = slic.process(image)
+
+    lab_threshold = lab_segmentation(segmented_image, 5, 33, 128, 165, 114, 131)
+    lab_threshold = cv2.cvtColor(lab_threshold, cv2.COLOR_BGR2GRAY)
+
+    x, y, w, h = contour_process(lab_threshold)
+
+    return [x, y, w, h]
+
+
+def video_processing(video_path):
+    input_video = cv.VideoCapture(video_path)
+    output_path = os.path.join(video_path.split(".")[0] + "_output.avi")
+    print("Video output path : ", output_path)
+    output_video = cv.VideoWriter(output_path, cv.VideoWriter_fourcc("M", "J", "P", "G"), 5, (400, 400))
+
+    frame_ctr = 0
+    while True:
+        print(f"Processing frame {frame_ctr}")
+        if frame_ctr % 5 == 0:
+            ret, frame = input_video.read()
+            if ret == False:
+                print("Breaking")
+                break
+            frame_rect = aurecle_segmentation(frame, 30, 400)
+
+            # bbox_y = frame_rect[1]
+            # bbox_h = frame_rect[3]
+
+            bbox_frame = cv.rectangle(
+                frame, frame_rect[0], frame_rect[1], frame_rect[0] + frame_rect[2], frame_rect[1] + frame_rect[3], (255, 0, 0), 2
+            )
+            output_video.write(bbox_frame)
+
+            # #! Get left and the right lines
+            # line_left = None
+            # line_right = None
+
+            # intersection_left = bbox_intersection(bbox_y, bbox_h, line_left)
+            # intersection_right = bbox_intersection(bbox_y, bbox_h, line_right)
+
+            # #! Stuff to do on the intersection
+
+            frame_ctr += 1
+
+        input_video.release()
+        output_video.release()
 
 
 # class Segmentation:
