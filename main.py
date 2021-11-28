@@ -20,8 +20,8 @@ args = parser.parse_args()
 """
 Commands:
 python main.py --video "sample_video\13_19_49.mp4"
-python main.py --image "sample\sample_c.png" --process "aurecle"
-python main.py --image "sample_grabs\sample_c.png" --process "slic"
+python main.py --image "sample_grabs\sample_c.png" --process "aurecle"
+python main.py --image "sample\sample_c.png" --process "slic"
 """
 
 if __name__ == "__main__":
@@ -42,6 +42,7 @@ if __name__ == "__main__":
             slic = SlicSegmentation(m=20, k=200)
             slic_image = slic.process(rimg)
             save(slic_image, "temp", mode="sk")
+
 
             # slic_image = slic_image[:, :, ::-1]
             # save(slic_image, "temp_bgr2rgb", mode="cv")

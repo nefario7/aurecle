@@ -3,8 +3,8 @@ import os
 import numpy as np
 from tqdm import tqdm
 import glob
-
 # * Imports
+from skimage.util import img_as_ubyte
 from slic import SlicSegmentation
 from utils import *
 
@@ -13,7 +13,7 @@ rishabh_path = r"/home/rishabh/CV_project/aurecle/sample_video/video_frame/"
 
 
 def lab_segmentation(image, L_lower, L_upper, a_lower, a_upper, b_lower, b_upper):
-    # image = cv.cvtColor(image, cv.COLOR_BGR2LAB)
+    image = cv.cvtColor(image, cv.COLOR_BGR2LAB)
     lowerRange = np.array([L_lower, a_lower, b_lower], dtype="uint8")
     upperRange = np.array([L_upper, a_upper, b_upper], dtype="uint8")
     mask = image[:].copy()
@@ -32,6 +32,15 @@ def lab_segmentation(image, L_lower, L_upper, a_lower, a_upper, b_lower, b_upper
 
     return faceLab
 
+def crop_image(image):
+    crop_mask = np.zeros_like(image)
+    CROP_X = 100
+    CROP_W = 200
+    CROP_Y = 100
+    CROP_H = 200
+    crop_mask[CROP_Y:CROP_Y+CROP_H, CROP_X:CROP_X + CROP_W]  = np.ones((CROP_H, CROP_W))
+    frame = cv.bitwise_and(image, image, mask  = crop_mask)
+    return frame
 
 def contour_process(image):
     threshold_value = 0.02
@@ -55,12 +64,11 @@ def aurecle_segmentation(image, m=40, k=400):
     slic = SlicSegmentation(m, k)
 
     segmented_image = slic.process(image)
-    show(segmented_image, "segmented image")
-
-    lab_threshold = lab_segmentation(segmented_image, 5, 33, 128, 165, 114, 131)
-    show(lab_threshold, "threshold")
+    # show(segmented_image, "segmented image")
+    segmented_image = img_as_ubyte(segmented_image)    
+    lab_threshold = lab_segmentation(segmented_image,0, 99, 106, 168, 114, 163 )
     lab_threshold = cv.cvtColor(lab_threshold, cv.COLOR_BGR2GRAY)
-
+    lab_threshold = crop_image(lab_threshold)
     x, y, w, h = contour_process(lab_threshold)
     frame_rect = [x,y,w,h]
 
