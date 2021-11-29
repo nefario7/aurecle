@@ -41,11 +41,13 @@ for i in range(frame_count):
     print('Clearance height is: ', round(height_estimated,2))
 
 x = np.arange(1,69) 
+ground_truth = np.ones(len(x))*13.5
 plt.title("Height Estimate by Aurecle", fontsize=20) 
 plt.xlabel("Frame", fontsize=15)
 plt.ylabel("Estimated Height $[ft]$", fontsize=15) 
 plt.plot(x, height_estimated_hist, label='Raw estimate') 
 plt.plot(x, height_estimated_moving_avg, label='Filtered estimate') 
+plt.plot(x, ground_truth, label='Ground truth')
 plt.legend(fontsize=13)
 plt.show()
 
