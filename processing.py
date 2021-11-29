@@ -3,6 +3,7 @@ import os
 import numpy as np
 from tqdm import tqdm
 import glob
+
 # * Imports
 from skimage.util import img_as_ubyte
 from slic import SlicSegmentation
@@ -32,15 +33,17 @@ def lab_segmentation(image, L_lower, L_upper, a_lower, a_upper, b_lower, b_upper
 
     return faceLab
 
+
 def crop_image(image):
     crop_mask = np.zeros_like(image)
     CROP_X = 100
     CROP_W = 200
     CROP_Y = 100
     CROP_H = 200
-    crop_mask[CROP_Y:CROP_Y+CROP_H, CROP_X:CROP_X + CROP_W]  = np.ones((CROP_H, CROP_W))
-    frame = cv.bitwise_and(image, image, mask  = crop_mask)
+    crop_mask[CROP_Y : CROP_Y + CROP_H, CROP_X : CROP_X + CROP_W] = np.ones((CROP_H, CROP_W))
+    frame = cv.bitwise_and(image, image, mask=crop_mask)
     return frame
+
 
 def contour_process(image):
     threshold_value = 0.02
@@ -52,30 +55,31 @@ def contour_process(image):
             row[:] = 0
 
     cont, hier = cv.findContours(image, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-    if(len(cont)<1):
+    if len(cont) < 1:
         return None
     sorted_contours = sorted(cont, key=cv.contourArea, reverse=True)
-    
+
     # cv.drawContours(image_color, sorted_contours, 0, (255,0,255), 2, cv.LINE_AA)
     rect = cv.boundingRect(sorted_contours[0])
     return rect
+
 
 def aurecle_segmentation(image, m=40, k=400):
     slic = SlicSegmentation(m, k)
 
     segmented_image = slic.process(image)
     # show(segmented_image, "segmented image")
-    segmented_image = img_as_ubyte(segmented_image)    
-    lab_threshold = lab_segmentation(segmented_image,0, 99, 106, 168, 114, 163 )
+    segmented_image = img_as_ubyte(segmented_image)
+    lab_threshold = lab_segmentation(segmented_image, 0, 99, 106, 168, 114, 163)
     lab_threshold = cv.cvtColor(lab_threshold, cv.COLOR_BGR2GRAY)
     lab_threshold = crop_image(lab_threshold)
     x, y, w, h = contour_process(lab_threshold)
-    frame_rect = [x,y,w,h]
+    frame_rect = [x, y, w, h]
 
     bbox_frame = cv.rectangle(
-                lab_threshold, (frame_rect[0], frame_rect[1]), (frame_rect[0] + frame_rect[2], frame_rect[1] + frame_rect[3]), (255, 0, 0), 2
-            )
-    show(bbox_frame,"bbox")
+        lab_threshold, (frame_rect[0], frame_rect[1]), (frame_rect[0] + frame_rect[2], frame_rect[1] + frame_rect[3]), (255, 0, 0), 2
+    )
+    show(bbox_frame, "bbox")
     return [x, y, w, h], segmented_image, lab_threshold
 
 
@@ -85,10 +89,6 @@ def video_processing(video_path):
 
     input_video = cv.VideoCapture(video_path)
     output_video = cv.VideoWriter(output_path, cv.VideoWriter_fourcc("M", "J", "P", "G"), 1, (400, 400))
-
-    # input_video = video.Video(video_path)
-    # print(input_video.frame_count(), input_video.duration())
-    # output_video = cv.VideoWriter(output_path, cv.VideoWriter_fourcc("M", "J", "P", "G"), 1, (400, 400))
 
     frame_ctr = 0
     while True:
@@ -106,6 +106,7 @@ def video_processing(video_path):
             bbox_frame = cv.rectangle(
                 frame, (frame_rect[0], frame_rect[1]), (frame_rect[0] + frame_rect[2], frame_rect[1] + frame_rect[3]), (255, 0, 0), 2
             )
+
             print("Bounding Box: ", frame_rect)
             cv.imwrite(rishabh_path + str(frame_ctr) + "_bbox" + ".jpg", bbox_frame)
             cv.imwrite(rishabh_path + str(frame_ctr) + "_seg" + ".jpg", seg_img)
