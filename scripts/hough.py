@@ -14,9 +14,12 @@ def canny_edge_detector(image):
         mask2 = cv2.inRange(image, lower_color_bound_yellow, upper_color_bound_yellow)
         mask = cv2.bitwise_or(mask1, mask2)
         cv2.imshow('mask', mask)
+        cv2.imwrite('clearance_estimation_pipeline/color_thres_mask.jpg', mask)
         target = cv2.bitwise_and(image,image, mask=mask)
         cv2.imshow('target', target)
+        cv2.imwrite('clearance_estimation_pipeline/color_thres_mask_overlay.jpg', target)
         canny = cv2.Canny(target, 69, 200) #69, 200
+        cv2.imwrite('clearance_estimation_pipeline/canny.jpg', canny)
     elif (flag==1):
         gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray_image, (5, 5), 0)
@@ -36,6 +39,7 @@ def mousePick(x, y):
         frame_copy = cv2.putText(frame_copy, str(i), (pick[i][0]+10, pick[i][1]-10),\
                           cv2.FONT_HERSHEY_SIMPLEX,1, (0, 0, 255), 1)
     cv2.imshow("img", frame_copy)
+    cv2.imwrite('clearance_estimation_pipeline/frame.jpg', frame)
     cv2.waitKey(1)
     if len(pick) > 3:
         print('Points selected: ', pick)
@@ -43,7 +47,7 @@ def mousePick(x, y):
         print('Point 1 BGR: ', frame[tuple(reversed(pick[1]))])
         print('Point 2 BGR: ', frame[tuple(reversed(pick[2]))])
         print('Point 3 BGR: ', frame[tuple(reversed(pick[3]))])
-        #pick =  [(179, 459), (439, 326), (591, 322), (761, 434)] #works on 334 and 304
+        pick =  [(179, 459), (439, 326), (591, 322), (761, 434)] #works on 334 and 304
         #pick = [(253, 446), (346, 387), (683, 374), (782, 431)] #works on 334
         region_of_interest()
 
@@ -54,6 +58,7 @@ def region_of_interest():
     cv2.fillConvexPoly(mask, polygon, 255) 
     masked_image = cv2.bitwise_and(canny_image, mask)
     cv2.imshow("masked image", masked_image)
+    cv2.imwrite('clearance_estimation_pipeline/region_of_interest.jpg', masked_image)
     houghTransform(masked_image) 
 
 def houghTransform(image):
@@ -105,15 +110,17 @@ def comb_image(line_image):
     global frame
     combo_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
     cv2.imshow("results", combo_image)
+    cv2.imwrite('clearance_estimation_pipeline/lane_detection.jpg', combo_image)
 
 if __name__ == '__main__':
 	
-    frame = cv2.imread('images/334.jpg') #304 #325 #328 #329 #331 #333 #334
+    frame = cv2.imread('inputs/320.jpg') #304 #325 #328 #329 #331 #333 #334
     scale_percent = 50 
     width = int(frame.shape[1] * scale_percent / 100)
     height = int(frame.shape[0] * scale_percent / 100)
     dim = (width, height)
     frame = cv2.resize(frame, dim)
+    print(frame.shape)
     cv2.namedWindow("img",cv2.WINDOW_NORMAL)
     cv2.imshow("img", frame)
 

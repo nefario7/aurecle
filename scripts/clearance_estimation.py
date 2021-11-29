@@ -1,12 +1,14 @@
 import cv2
 import numpy as np
 import operator
+import math
 
 class HeightEstimation(object):
-    def __init__(self, frame_org, frame_bbox, bbox_params): 
+    def __init__(self, frame_org, frame_bbox, bbox_params, moving_avg): 
         self.frame_org = frame_org
         self.frame_bbox = frame_bbox
         self.bbox_params = bbox_params
+        self.moving_avg = moving_avg
         self.pick = [(179, 459), (439, 326), (591, 322), (761, 434)]
         self.LANE_WIDTH = 12
         self.height = None
@@ -106,7 +108,12 @@ class HeightEstimation(object):
 
     def __height_estimate(self, inter0, inter1, lane_width_pix, image):
         __, __, __, height_pix = self.bbox_params
-        self.height = self.LANE_WIDTH*(height_pix/lane_width_pix)
+
+        if math.isnan(self.moving_avg):
+            self.height = self.LANE_WIDTH*(height_pix/lane_width_pix)
+        else:
+            self.height = (self.LANE_WIDTH*(height_pix/lane_width_pix) + self.moving_avg)/2
+
         height_overlay_image = cv2.line(image, tuple(map(operator.add, inter1, (-1*int(lane_width_pix/2), 0))), \
                                         tuple(map(operator.add, inter1, (-1*int(lane_width_pix/2), -1*height_pix))), (0, 255, 0), thickness=2)
         height_overlay_image = cv2.line(image, inter0, inter1, (255, 0, 0), thickness=2)
