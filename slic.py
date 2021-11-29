@@ -8,6 +8,7 @@ from skimage.transform import resize
 from skimage.util import img_as_ubyte
 from tqdm import tqdm
 from skimage import img_as_ubyte
+from skimage.segmentation import slic
 
 # * Imports
 from utils import *
@@ -35,6 +36,9 @@ class SlicSegmentation:
         self.tag = {}
         self.k = k
         self.m = m
+
+    def __init__(self):
+        pass
 
     # function which returns an object of class SuperPixel
     def __make_superPixel(self, h, w):
@@ -162,3 +166,19 @@ class SlicSegmentation:
         segmented_image = color.lab2rgb(segmented_image)
 
         return segmented_image
+
+    def skimage_process(self, image):
+        slic_params = {
+            "n_segments": 80,
+            "compactness": 0.008,
+            "max_iter": 10,
+            "multichannel": True,
+            "convert2lab": True,
+            "max_size_factor": 100,
+            "sigma": 0.01,
+            "min_size_factor": 0.05,
+        }
+        slic_image = slic(image, **slic_params)
+        cv_image = img_as_ubyte(slic_image)
+
+        return cv_image

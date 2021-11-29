@@ -3,9 +3,10 @@ import os
 import numpy as np
 from tqdm import tqdm
 import glob
+from skimage.filters import threshold_multiotsu
+from skimage.util import img_as_ubyte
 
 # * Imports
-from skimage.util import img_as_ubyte
 from slic import SlicSegmentation
 from utils import *
 
@@ -62,6 +63,36 @@ def contour_process(image):
     # cv.drawContours(image_color, sorted_contours, 0, (255,0,255), 2, cv.LINE_AA)
     rect = cv.boundingRect(sorted_contours[0])
     return rect
+
+
+def aurecle_segmentation_skimage(image):
+    slic = SlicSegmentation()
+    segmented_image = slic.skimage_process(image)
+    gray_image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+
+    segmented_image = cv.resize(segmented_image, (400, 400))
+    gray_image = cv.resize(segmented_image, (400, 400))
+
+    added_image = cv.addWeighted(gray_image, 1, segmented_image, 1, 1)
+    cv.imwrite("basdfsdf.png", added_image)
+    print("\nSLIC Segmentation Complete!")
+
+    thres_image = threshold_multiotsu(added_image)
+    regions = np.digitize(added_image, bins=thres_image)
+    print("\nThresholding Complete!")
+
+    regions = regions.astype(np.uint8)
+    print(regions.shape)
+    thres_image = crop_image(regions)
+    x, y, w, h = contour_process(thres_image)
+    frame_rect = [x, y, w, h]
+    print("\nContour Detection Complete!")
+
+    bbox_frame = cv.rectangle(
+        thres_image, (frame_rect[0], frame_rect[1]), (frame_rect[0] + frame_rect[2], frame_rect[1] + frame_rect[3]), (255, 0, 0), 2
+    )
+    show(bbox_frame, "bbox")
+    return [x, y, w, h], segmented_image, thres_image
 
 
 def aurecle_segmentation(image, m=40, k=400):

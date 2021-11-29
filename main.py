@@ -43,6 +43,8 @@ if __name__ == "__main__":
             slic_image = slic.process(rimg)
             save(slic_image, "temp", mode="sk")
 
-
-            # slic_image = slic_image[:, :, ::-1]
-            # save(slic_image, "temp_bgr2rgb", mode="cv")
+        # * skimage SLIC Pipeline
+        elif args.process == "skslic":
+            print("Running skiamge SLIC Pipeline...")
+            rimg = cv.imread(args.image)
+            _, _, _ = aurecle_segmentation_skimage(rimg)
