@@ -6,13 +6,13 @@ from clearance_estimation import HeightEstimation
 height_estimated_hist = []
 height_estimated_moving_avg = []
 height_estimated_moving_avg_avg = []
-bbox_params_hist = np.load('inputs/frames/bbox.npy')
+bbox_params_hist = np.load('input_to_main/bbox.npy')
 #frame_count = len(bbox_params_hist) 
 frame_count = 68
 
 for i in range(frame_count):
     filename = str(i+1) + str('.jpg')
-    filepath = str('inputs/frames/') + filename
+    filepath = str('input_to_main') + filename
     frame = cv2.imread(filepath)
 
     scale_percent = 50 
@@ -37,7 +37,7 @@ for i in range(frame_count):
     height_estimated_moving_avg.append(np.mean(height_estimated_hist))
     height_estimated_moving_avg_avg.append(np.mean(height_estimated_moving_avg))
 
-    cv2.imwrite('outputs/' + filename.rsplit(".", 1)[0] + '-overlay.jpg', height_overlay_image)
+    cv2.imwrite('outputs_from_main/' + filename.rsplit(".", 1)[0] + '-overlay.jpg', height_overlay_image)
     print('Clearance height is: ', round(height_estimated,2))
 
 x = np.arange(1,69) 
