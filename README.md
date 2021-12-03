@@ -19,7 +19,6 @@ pip install -r requirements.txt
 
 
 ## Height Estimation
-### Convert input video to frames
 
 1. Run video_to_frames.py to convert input video into frames. 
 Input video filename: “input/input_video.mp4” (default)
