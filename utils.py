@@ -8,7 +8,7 @@ from skimage import io
 
 base_path = r"sample"
 
-
+# Function to show image in OpenCV image window
 def show(image, header = None):
     if header is None:
         letters = string.ascii_lowercase
@@ -18,7 +18,7 @@ def show(image, header = None):
     cv.waitKey(0)
     cv.destroyAllWindows()
 
-
+# Function to save opencv/ skimage processed images
 def save(image, name, mode="cv", pref="", ext=""):
     save_path = os.path.join(base_path, pref + name.split(".")[0] + ext + ".png")
     if mode == "cv":
@@ -27,7 +27,7 @@ def save(image, name, mode="cv", pref="", ext=""):
         io.imsave(save_path, image)
     print("Image saved at : ", save_path)
 
-
+# Function to find intersection with bounding box
 def bbox_intersection(self, y, h, line):
     slope = (line[3] - line[1]) / (line[2] - line[0])
     y = y + h
