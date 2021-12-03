@@ -11,28 +11,21 @@ AuReClE would utilize a Computer Vision-based model and an AR Pipeline along wit
 pip install -r requirements.txt
 ```
 ## Segmentation
-```
-python main.py
-```
-```
-<dir process thingy>
-```
+1. Run main.py --process "segmentation" --directory "processing/input_to_main/" argument which runs segmentation and thresholding pipeline and stores it in processing/input_to_main/   
+
+
 ## Height Estimation
 ### Convert input video to frames
-Run video_to_frames.py to convert input video into frames.
-input video filename: “input_video.mp4” (default)
-frames saved to dir: “input_to_main/” (default)
-```
-python video_to_frames.py
-```
-2. Run main.py which calls clearance_estimation.py to take input frames & a .npy file (bounding box parameters) from the dir “input_to_main/“.
-Default input video filename: “input_video.mp4”.
-Default frame saved to dir: “input_to_main/”
-```
-python clearance_estimation.py
-```
-   Output frames with clearance markings will be saved to dir “output_from_main/”
-3. Run video_compiler.py to create output video from the frames in dir “output_from_main/“. Output video with extension .avi will be saved to dir “final_outputs/”
+
+1. Run video_to_frames.py to convert input video into frames. 
+Input video filename: “input/input_video.mp4” (default)
+frames saved to dir: “processing/input_to_main/” (default)
+
+2. Run main.py --process "heightestimation" argument which calls clearance_estimation.py to take input frames & .npy file (bounding box parameters) from the dir “input_to_main/“.
+Default frame saved to dir: “processing/input_to_main/” 
+Output frames with clearance markings will be saved to dir “processing/output_from_main/”
+
+3. Run video_compiler.py to create output video from the frames in dir “processing/output_from_main“. Output video with extension .avi will be saved to dir “output/”
 
 ## Repository Structure
 ```
