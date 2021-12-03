@@ -130,6 +130,7 @@ class SlicSegmentation:
         # self.__save_output(image, name)
         return image
 
+    # function to save outputs images
     def __save_output(self, lab_arr, save_name):
         save_path = os.path.join(self.base_path, save_name)
         rgb_arr = color.lab2rgb(lab_arr)
@@ -148,6 +149,7 @@ class SlicSegmentation:
 
         return return_image
 
+    # function to process slic segmentation
     def process(self, frame):
         img = resize(frame, (400, 400), anti_aliasing=True)
 

@@ -12,8 +12,8 @@ from slic import SlicSegmentation
 from utils import *
 from processing import *
 
-base_path = r"sample"
 
+# Argument Parser
 parser = argparse.ArgumentParser(description="Aurecle Processing")
 parser.add_argument("--image", dest="image", required=False, type=str, help="image name in sample")
 parser.add_argument("--process", dest="process", required=False, type=str, help="process to run on the image")
@@ -22,36 +22,14 @@ parser.add_argument("--directory", dest="dir", required=False, type=str, help="p
 
 args = parser.parse_args()
 
-"""
-Commands:
-python main.py --video "sample_video\13_19_49.mp4"
-python main.py --image "sample_grabs\sample_c.png" --process "aurecle"
-python main.py --image "sample\sample_c.png" --process "slic"
-"""
-
 if __name__ == "__main__":
-    if args.video is not None:
-        video_processing(args.video)
-
-    if args.image is not None:
-        # * Complete Aurecle Pipeline
-        if args.process == "aurecle":
-            print("Running Aurecle Pipeline...")
-            rimg = cv.imread(args.image)
-            _, _, _ = aurecle_segmentation(rimg, m=20, k=200)
-
-        # * SLIC Segmentation
-        elif args.process == "slic":
-            print("Running SLIC Segmentation...")
-            rimg = cv.imread(args.image)
-            slic = SlicSegmentation(m=20, k=200)
-            slic_image = slic.process(rimg)
-            save(slic_image, "temp", mode="sk")
-    if args.process == "directory-process":
+    # * Run Segmenation Pipeline
+    if args.process == "segmentation":
         dir_path = args.dir
         directory_process(dir_path)
 
-    if args.process == "height":
+    # * Run Height Estimation Pipeline
+    if args.process == "heightestimation":
         height_estimated_hist = []
         height_estimated_moving_avg = []
         height_estimated_moving_avg_avg = []
@@ -92,6 +70,8 @@ if __name__ == "__main__":
 
         x = np.arange(1,69) 
         ground_truth = np.ones(len(x))*13.5
+
+        # Height Estimation Plot
         plt.title("Height Estimate by Aurecle", fontsize=20) 
         plt.xlabel("Frame", fontsize=15)
         plt.ylabel("Estimated Height $[ft]$", fontsize=15) 
@@ -104,7 +84,22 @@ if __name__ == "__main__":
         cv.waitKey(0)
         cv.destroyAllWindows()
 
+    # * Process just a video (TESTING ONLY)
+    # if args.video is not None:
+    #     video_processing(args.video)
 
+    # * Processing segmentation on images (TESTING ONLY)
+    # if args.image is not None:
+    #     # * Complete Aurecle Pipeline
+    #     if args.process == "aurecle":
+    #         print("Running Aurecle Pipeline...")
+    #         rimg = cv.imread(args.image)
+    #         _, _, _ = aurecle_segmentation(rimg, m=20, k=200)
 
-            # slic_image = slic_image[:, :, ::-1]
-            # save(slic_image, "temp_bgr2rgb", mode="cv")
+    #     # * SLIC Segmentation
+    #     elif args.process == "slic":
+    #         print("Running SLIC Segmentation...")
+    #         rimg = cv.imread(args.image)
+    #         slic = SlicSegmentation(m=20, k=200)
+    #         slic_image = slic.process(rimg)
+    #         save(slic_image, "temp", mode="sk")
