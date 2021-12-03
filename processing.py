@@ -148,7 +148,7 @@ def directory_process(dir_path):
         [x,y,w,h], segmented_image, lab_threshold = aurecle_segmentation(frame, m = 20, k=200)
         bbox = [frame_no, x, y, w, h]
         bboxs.append(bbox)
-        np.save('input_to_main/bbox.npy', bboxs)
+        np.save('processing/input_to_main/bbox.npy', bboxs)
         print("saved for frame: "+ str(frame_no))
         frame_rect = [x,y,w,h]
 
