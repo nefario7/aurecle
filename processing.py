@@ -34,8 +34,8 @@ def lab_segmentation(image, L_lower, L_upper, a_lower, a_upper, b_lower, b_upper
 
 def crop_image(image):
     crop_mask = np.zeros_like(image)
-    CROP_X = 100
-    CROP_W = 200
+    CROP_X = 175
+    CROP_W = 120
     CROP_Y = 100
     CROP_H = 200
     crop_mask[CROP_Y:CROP_Y+CROP_H, CROP_X:CROP_X + CROP_W]  = np.ones((CROP_H, CROP_W))
@@ -45,7 +45,7 @@ def crop_image(image):
 def contour_process(image):
     threshold_value = 0.02
     image_copy = image.copy()
-    image[300:400, :] = 0
+    # image[350:400, :] = 0
 
     for row in image:
         if sum(row) < threshold_value * 55 * image.shape[1]:
@@ -66,16 +66,21 @@ def aurecle_segmentation(image, m=40, k=400):
     segmented_image = slic.process(image)
     # show(segmented_image, "segmented image")
     segmented_image = img_as_ubyte(segmented_image)    
+    save(segmented_image, 'segmented_image')
     lab_threshold = lab_segmentation(segmented_image,0, 99, 106, 168, 114, 163 )
+    save(lab_threshold, 'lab_threshold')
     lab_threshold = cv.cvtColor(lab_threshold, cv.COLOR_BGR2GRAY)
     lab_threshold = crop_image(lab_threshold)
+
+    # lab_threshold =cv.resize(lab_threshold, (960,540))
     x, y, w, h = contour_process(lab_threshold)
+    
     frame_rect = [x,y,w,h]
 
     bbox_frame = cv.rectangle(
                 lab_threshold, (frame_rect[0], frame_rect[1]), (frame_rect[0] + frame_rect[2], frame_rect[1] + frame_rect[3]), (255, 0, 0), 2
             )
-    show(bbox_frame,"bbox")
+    save(bbox_frame,"bbox")
     return [x, y, w, h], segmented_image, lab_threshold
 
 
@@ -107,9 +112,6 @@ def video_processing(video_path):
                 frame, (frame_rect[0], frame_rect[1]), (frame_rect[0] + frame_rect[2], frame_rect[1] + frame_rect[3]), (255, 0, 0), 2
             )
             print("Bounding Box: ", frame_rect)
-            cv.imwrite(rishabh_path + str(frame_ctr) + "_bbox" + ".jpg", bbox_frame)
-            cv.imwrite(rishabh_path + str(frame_ctr) + "_seg" + ".jpg", seg_img)
-            cv.imwrite(rishabh_path + str(frame_ctr) + "_thr" + ".jpg", thr_img)
             output_video.write(bbox_frame)
 
             # #! Get left and the right lines
@@ -126,6 +128,48 @@ def video_processing(video_path):
     input_video.release()
     output_video.release()
 
+def directory_process(dir_path):
+    # output_path = os.path.join(dir_path , "output.avi")
+    # print("Video output path : ", output_path)
+
+
+    # fourcc = cv.VideoWriter_fourcc("MJPG")
+    # writer = None
+    # (h, w) = (400,400)
+
+    # zeros = None
+    print(dir_path)
+
+    bboxs = []
+    for i in range(len(os.listdir(dir_path))):
+        frame_no = i+1
+        print("Processing Frame no: " + str(frame_no))
+        frame = cv.imread(dir_path+"/"+str(frame_no)+ ".jpg")
+        [x,y,w,h], segmented_image, lab_threshold = aurecle_segmentation(frame, m = 20, k=200)
+        bbox = [frame_no, x, y, w, h]
+        bboxs.append(bbox)
+        np.save('bbox.npy', bboxs)
+        print("saved for frame: "+ str(frame_no))
+        frame_rect = [x,y,w,h]
+
+        bbox_frame = cv.rectangle(
+            segmented_image, (frame_rect[0], frame_rect[1]), (frame_rect[0] + frame_rect[2], frame_rect[1] + frame_rect[3]), (255, 0, 0), 2
+            )
+        save(bbox_frame, "bbox_"+str(frame_no),mode="cv")
+        save(lab_threshold, "lab_thresh_"+str(frame_no),mode="cv")
+        save(segmented_image, "segmented_"+str(frame_no),mode="cv")
+
+        # cv.imshow("output", bbox_frame)
+        # cv.waitKey(0)
+        # cv.destroyAllWindows()
+
+            
+        #! give the output of the frame 
+    	# if writer is None:
+        #     # store the image dimensions, initialize the video writer,
+        #     # and construct the zeros array
+        #     (h, w) = frame.shape[:2]
+        #     writer = cv.VideoWriter(output_path, fourcc, 1,(w, h), True)
 
 # class Segmentation:
 #     def __init__(self, path):

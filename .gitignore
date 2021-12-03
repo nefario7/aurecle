@@ -4,9 +4,10 @@
 # Folders
 reference
 segmentation-images-test
-# sample
-manpreet
+sample
 sample_video/13_19_49_Pro_output.avi
 sample_video/13_19_49_Pro.mp4
 sample_grabs/sample_c.png
 sample_grabs/sample_7.png
+segmented_frames
+frames

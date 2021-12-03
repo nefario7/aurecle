@@ -12,6 +12,11 @@ import os
 
 [  0 105  51]
 [106 164 177]
+
+Latest SLIC Fin.
+[  0 106 114]
+[ 99 168 163]
+
 '''
 
 def Lab_Segmentation(image,L_lower, L_upper, a_lower, a_upper, b_lower, b_upper):
@@ -42,7 +47,7 @@ def nothing(x):
 def main(argv):
 
 
-    image = cv2.imread('sample/ret_image_1.png')
+    image = cv2.imread('segmented-image.png')
     
     lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
     cv2.namedWindow("Output")

@@ -15,6 +15,8 @@ parser = argparse.ArgumentParser(description="Aurecle Processing")
 parser.add_argument("--image", dest="image", required=False, type=str, help="image name in sample")
 parser.add_argument("--process", dest="process", required=False, type=str, help="process to run on the image")
 parser.add_argument("--video", dest="video", required=False, type=str, help="video name to process")
+parser.add_argument("--directory", dest="dir", required=False, type=str, help="path of directory to process frames")
+
 args = parser.parse_args()
 
 """
@@ -33,7 +35,7 @@ if __name__ == "__main__":
         if args.process == "aurecle":
             print("Running Aurecle Pipeline...")
             rimg = cv.imread(args.image)
-            _, _, _ = aurecle_segmentation(rimg, m=30, k=400)
+            _, _, _ = aurecle_segmentation(rimg, m=20, k=200)
 
         # * SLIC Segmentation
         elif args.process == "slic":
@@ -42,6 +44,10 @@ if __name__ == "__main__":
             slic = SlicSegmentation(m=20, k=200)
             slic_image = slic.process(rimg)
             save(slic_image, "temp", mode="sk")
+    if args.process == "directory-process":
+        dir_path = args.dir
+        directory_process(dir_path)
+
 
 
             # slic_image = slic_image[:, :, ::-1]
