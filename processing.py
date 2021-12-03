@@ -8,11 +8,26 @@ from skimage.util import img_as_ubyte
 from slic import SlicSegmentation
 from utils import *
 
+'''
+Importing the libraries and functions from slic and utils files 
+'''
+
+
 base_path = r"pitt_gray1_out_m20_k200.png"
 rishabh_path = r"/home/rishabh/CV_project/aurecle/sample_video/video_frame/"
 
 
 def lab_segmentation(image, L_lower, L_upper, a_lower, a_upper, b_lower, b_upper):
+
+    '''
+    Function to segment the image in LAB space 
+    Input: Image and lower and uppper ranges IN LAB space 
+    Output: Segmented Image
+
+    Takes in the image, converts it into LAB Space 
+    Use the cv.inRange function to create a mask between the lower and upper ranges 
+    Use the mask to segment the image.
+    '''
     image = cv.cvtColor(image, cv.COLOR_BGR2LAB)
     lowerRange = np.array([L_lower, a_lower, b_lower], dtype="uint8")
     upperRange = np.array([L_upper, a_upper, b_upper], dtype="uint8")
@@ -33,6 +48,17 @@ def lab_segmentation(image, L_lower, L_upper, a_lower, a_upper, b_lower, b_upper
     return faceLab
 
 def crop_image(image):
+
+    '''
+    Function to mask the cropped region of the image 
+    Input: Image 
+    Output: Cropped image
+
+    CROP_X starting range of the image you want to keep 
+    CROP_W the width of the mask 
+    CORP Y and CROP_H same as above but for Y axis 
+
+    '''
     crop_mask = np.zeros_like(image)
     CROP_X = 175
     CROP_W = 120
@@ -43,6 +69,19 @@ def crop_image(image):
     return frame
 
 def contour_process(image):
+    '''
+    This function takes in a lab_Segmented image and then returns the bounding box of the open area and the images along with it
+
+    Input: Image 
+    Output: Bounding box for the contour
+
+    Steps:
+    From the thresholded image, loop through the rows to remove the rows with noise i.e. where on pixels are less than a threshold 
+    we find the contour 
+    sort it and take the max contour with the highest area 
+
+
+    '''
     threshold_value = 0.02
     image_copy = image.copy()
     # image[350:400, :] = 0
@@ -61,6 +100,18 @@ def contour_process(image):
     return rect
 
 def aurecle_segmentation(image, m=40, k=400):
+    '''
+    The main function which does the segmentation for aurecle. 
+    Input: Takes in the input image 
+    Output: Returns the bounding box, segmented image and the lab-threshold image. 
+
+    Steps 
+    Run slic on the image. 
+    Run lab_segmentation function on it 
+    Do the contour processing 
+    draw the bbox on the image
+    '''
+
     slic = SlicSegmentation(m, k)
 
     segmented_image = slic.process(image)
